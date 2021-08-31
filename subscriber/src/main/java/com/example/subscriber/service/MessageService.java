@@ -1,26 +1,22 @@
 package com.example.subscriber.service;
 
-import com.example.subscriber.dao.PurchaseDao;
-import com.example.subscriber.dao.SubscriptionDao;
+import com.example.subscriber.entity.Purchase;
+import com.example.subscriber.entity.Subscription;
 import com.example.subscriber.dto.MessageRequest;
+import com.example.subscriber.exception.UnknownActionException;
 import com.example.subscriber.repository.PurchaseRepository;
 import com.example.subscriber.repository.SubscriptionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class MessageService {
+
     private final PurchaseRepository purchaseRepository;
     private final SubscriptionRepository subscriptionRepository;
-
-    @Autowired
-    public MessageService(PurchaseRepository purchaseRepository,
-                          SubscriptionRepository subscriptionRepository) {
-        this.purchaseRepository = purchaseRepository;
-        this.subscriptionRepository = subscriptionRepository;
-    }
 
     @Transactional
     public void handleMessage(MessageRequest request) {
@@ -32,23 +28,25 @@ public class MessageService {
                 createSubscription(request);
                 break;
             default:
-                throw new UnsupportedOperationException();
+                throw new UnknownActionException();
         }
     }
 
     private void createPurchase(MessageRequest request) {
-        PurchaseDao purchaseDao = new PurchaseDao();
-        purchaseDao.setMsisdn(request.getMsisdsn());
-        purchaseDao.setTimestamp(request.getTimestamp());
+        Purchase newPurchase = Purchase.builder()
+                .msisdn(request.getMsisdn())
+                .created(request.getTimestamp())
+                .build();
 
-        purchaseRepository.save(purchaseDao);
+        purchaseRepository.save(newPurchase);
     }
 
     private void createSubscription(MessageRequest request) {
-        SubscriptionDao subscriptionDao = new SubscriptionDao();
-        subscriptionDao.setMsisdn(request.getMsisdsn());
-        subscriptionDao.setTimestamp(request.getTimestamp());
+        Subscription newSubscription = Subscription.builder()
+                .msisdn(request.getMsisdn())
+                .created(request.getTimestamp())
+                .build();
 
-        subscriptionRepository.save(subscriptionDao);
+        subscriptionRepository.save(newSubscription);
     }
 }

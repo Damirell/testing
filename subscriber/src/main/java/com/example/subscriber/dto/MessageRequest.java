@@ -1,21 +1,22 @@
 package com.example.subscriber.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
-@Data
+@Getter
+@ToString
 public class MessageRequest {
     @NotNull
-    @JsonProperty("msisdsn")
-    private Integer msisdsn;
+    private Integer msisdn;
 
     @NotNull
-    @JsonProperty("action")
     private Action action;
 
     @NotNull
-    @JsonProperty("timestamp")
-    private Long timestamp;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    private LocalDateTime timestamp;
 }
